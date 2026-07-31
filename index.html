@@ -346,7 +346,6 @@
             display: inline;
         }
 
-        /* ===== NOTE MARKER - cerc cu "i" poziționat mai sus ===== */
         .note-marker {
             display: inline-flex;
             align-items: center;
@@ -382,7 +381,6 @@
             transform: scale(0.9);
         }
 
-        /* Tema deschisă */
         body.light-theme .note-marker {
             color: #c0392b;
             border-color: #c0392b;
@@ -396,7 +394,6 @@
             box-shadow: 0 0 24px rgba(192, 57, 43, 0.2);
         }
 
-        /* Tema închisă */
         body:not(.light-theme) .note-marker {
             color: #ff8c42;
             border-color: #ff8c42;
@@ -553,26 +550,6 @@
             font-size: 1.1rem;
         }
 
-        .progress-container {
-            position: fixed;
-            bottom: 64px;
-            left: 0;
-            width: 100%;
-            height: 4px;
-            background: #1a1a1a;
-            z-index: 100;
-            display: none;
-        }
-        .progress-container.visible {
-            display: block;
-        }
-        .progress-fill {
-            height: 100%;
-            width: 0%;
-            background: #b8860b;
-            transition: width 0.3s ease;
-        }
-
         .bottom-nav {
             position: fixed;
             bottom: 0;
@@ -688,9 +665,6 @@
                 min-width: 70px;
                 font-size: 0.85rem;
             }
-            .progress-container {
-                bottom: 58px;
-            }
             .search-overlay {
                 padding: 20px 12px;
             }
@@ -753,11 +727,6 @@
         <button class="search-close" id="searchCloseBtn">✕</button>
     </div>
     <div class="search-results" id="searchResults"></div>
-</div>
-
-<!-- BARA DE PROGRES -->
-<div class="progress-container" id="progressContainer">
-    <div class="progress-fill" id="progressFill"></div>
 </div>
 
 <!-- TOP BAR -->
@@ -1113,8 +1082,6 @@
     const bookTitleDisplay = document.getElementById('bookTitleDisplay');
     const chapterSubDisplay = document.getElementById('chapterSubDisplay');
     const textContent = document.getElementById('text-content');
-    const progressContainer = document.getElementById('progressContainer');
-    const progressFill = document.getElementById('progressFill');
     const bottomNav = document.getElementById('bottomNav');
     const scrollMarkerBtn = document.getElementById('scrollMarkerBtn');
     const markerTooltip = document.getElementById('markerTooltip');
@@ -1199,13 +1166,11 @@
         bottomPrevBtn.disabled = isFirst;
         bottomNextBtn.disabled = isLast;
 
-        updateProgress(bookKey, chapterIndex);
         attachNoteListeners();
         updateMarkerUI();
 
         menuPage.style.display = 'none';
         readerPage.style.display = 'flex';
-        progressContainer.classList.add('visible');
         bottomNav.classList.add('visible');
         backBtn.classList.add('visible');
 
@@ -1230,14 +1195,6 @@
             }
             chapterSelect.appendChild(option);
         });
-    }
-
-    function updateProgress(bookKey, chapterIndex) {
-        const book = bibleData[bookKey];
-        if (!book) return;
-        const total = book.chapters.length;
-        const percent = ((chapterIndex + 1) / total) * 100;
-        progressFill.style.width = Math.min(percent, 100) + '%';
     }
 
     function attachNoteListeners() {
@@ -1368,7 +1325,6 @@
     function showMenu() {
         menuPage.style.display = 'flex';
         readerPage.style.display = 'none';
-        progressContainer.classList.remove('visible');
         bottomNav.classList.remove('visible');
         backBtn.classList.remove('visible');
         hideNote();
