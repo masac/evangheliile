@@ -1,0 +1,1681 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Evangheliile</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', 'Times New Roman', serif;
+            background-color: #0a0a0a;
+            color: #e8e0d8;
+            padding: 0 16px 120px 16px;
+            min-height: 100vh;
+            touch-action: pan-y;
+        }
+
+        body.light-theme {
+            background-color: #f5f0e8;
+            color: #1a1a1a;
+        }
+        body.light-theme .top-bar {
+            border-bottom-color: #bbb;
+            background: #f5f0e8;
+        }
+        body.light-theme .controls button {
+            border-color: #888;
+            color: #1a1a1a;
+            background: #e0d8cc;
+        }
+        body.light-theme .controls button:hover {
+            background: #ccc;
+        }
+        body.light-theme .menu-item {
+            background: #e8e0d4;
+            color: #1a1a1a;
+        }
+        body.light-theme .menu-item:hover {
+            background: #ddd6c8;
+        }
+        body.light-theme .chapter-nav {
+            background: #e0d8cc;
+        }
+        body.light-theme .chapter-select {
+            background: #f5f0e8;
+            color: #1a1a1a;
+            border-color: #999;
+        }
+        body.light-theme .note-popup {
+            background: #fff;
+            color: #1a1a1a;
+            border: 2px solid #b8860b;
+        }
+        body.light-theme .bottom-nav {
+            background: #e8e0d4;
+            border-top: 1px solid #bbb;
+        }
+        body.light-theme .bottom-nav button {
+            color: #1a1a1a;
+            background: #d5cdc0;
+        }
+        body.light-theme .bottom-nav button:hover {
+            background: #c5bdb0;
+        }
+        body.light-theme .bottom-nav .chapter-indicator {
+            color: #1a1a1a;
+        }
+        body.light-theme .note-marker {
+            color: #c0392b;
+            background: rgba(192, 57, 43, 0.15);
+            border-color: rgba(192, 57, 43, 0.5);
+        }
+        body.light-theme .note-marker:hover {
+            background: rgba(192, 57, 43, 0.3);
+            border-color: #c0392b;
+        }
+        body.light-theme .search-overlay {
+            background: rgba(245, 240, 232, 0.97);
+        }
+        body.light-theme .search-overlay input {
+            background: #fff;
+            color: #1a1a1a;
+            border-color: #bbb;
+        }
+        body.light-theme .search-overlay .search-result {
+            border-bottom-color: #ddd;
+        }
+        body.light-theme .search-overlay .search-result:hover {
+            background: #e8e0d4;
+        }
+        body.light-theme .scroll-marker-btn.active {
+            color: #c0392b;
+        }
+
+        .top-bar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 0 10px 0;
+            border-bottom: 1px solid #333;
+            margin-bottom: 16px;
+            gap: 8px;
+            position: sticky;
+            top: 0;
+            background: #0a0a0a;
+            z-index: 50;
+        }
+
+        .top-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .back-btn {
+            color: #b8860b;
+            cursor: pointer;
+            font-size: 1.3rem;
+            border: none;
+            background: none;
+            padding: 0 4px;
+            display: none;
+            line-height: 1;
+        }
+        .back-btn.visible {
+            display: block;
+        }
+        .back-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            letter-spacing: 1px;
+            color: #b8860b;
+        }
+
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .controls button {
+            background: #1a1a1a;
+            border: 1px solid #444;
+            color: #e8e0d8;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: inherit;
+        }
+        .controls button:hover {
+            background: #2a2a2a;
+        }
+
+        .font-size-display {
+            font-size: 0.85rem;
+            min-width: 40px;
+            text-align: center;
+        }
+
+        .scroll-marker-btn {
+            background: none;
+            border: none;
+            font-size: 1.3rem;
+            cursor: pointer;
+            color: #555;
+            transition: 0.2s;
+            padding: 0 4px;
+            line-height: 1;
+            position: relative;
+        }
+        .scroll-marker-btn.active {
+            color: #b8860b;
+            text-shadow: 0 0 20px rgba(184, 134, 11, 0.3);
+        }
+        .scroll-marker-btn:hover {
+            transform: scale(1.2);
+        }
+        .scroll-marker-btn .tooltip {
+            display: none;
+            position: absolute;
+            bottom: -28px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #222;
+            color: #e8e0d8;
+            font-size: 0.6rem;
+            padding: 2px 10px;
+            border-radius: 8px;
+            white-space: nowrap;
+            border: 1px solid #444;
+            z-index: 60;
+        }
+        .scroll-marker-btn:hover .tooltip {
+            display: block;
+        }
+        body.light-theme .scroll-marker-btn .tooltip {
+            background: #e0d8cc;
+            color: #1a1a1a;
+            border-color: #999;
+        }
+
+        #menu-page {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-top: 30px;
+            padding: 10px 0 60px 0;
+        }
+
+        .menu-item {
+            font-size: 1.5rem;
+            font-weight: bold;
+            padding: 18px 16px;
+            border-left: 6px solid #b8860b;
+            background: #141414;
+            border-radius: 0 12px 12px 0;
+            cursor: pointer;
+            transition: 0.2s;
+            color: #e8e0d8;
+        }
+        .menu-item:hover {
+            background: #1f1f1f;
+            transform: translateX(6px);
+        }
+        .menu-item .book-icon {
+            margin-right: 12px;
+        }
+
+        #reader-page {
+            display: none;
+            flex-direction: column;
+            touch-action: pan-y;
+        }
+
+        .chapter-header {
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #444;
+            padding-bottom: 12px;
+        }
+
+        .chapter-header .book-title {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #b8860b;
+            letter-spacing: 0.5px;
+        }
+
+        .chapter-header .chapter-sub {
+            font-size: 1.2rem;
+            color: #aaa;
+            margin-top: 2px;
+            font-style: italic;
+        }
+
+        body.light-theme .chapter-header {
+            border-bottom-color: #bbb;
+        }
+        body.light-theme .chapter-header .chapter-sub {
+            color: #555;
+        }
+
+        .chapter-nav {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            background: #161616;
+            padding: 10px 16px;
+            border-radius: 30px;
+            margin: 8px 0 18px 0;
+            flex-wrap: wrap;
+        }
+
+        .chapter-nav button {
+            background: none;
+            border: 1px solid #444;
+            color: #e8e0d8;
+            padding: 6px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: 0.2s;
+            font-family: inherit;
+        }
+        .chapter-nav button:hover:not(:disabled) {
+            background: #2a2a2a;
+        }
+        .chapter-nav button:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .chapter-select {
+            background: #0a0a0a;
+            color: #e8e0d8;
+            border: 1px solid #444;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 1rem;
+            font-family: inherit;
+            cursor: pointer;
+            min-width: 80px;
+            text-align: center;
+        }
+        .chapter-select option {
+            background: #1a1a1a;
+        }
+
+        .chapter-info {
+            font-size: 0.9rem;
+            color: #999;
+            min-width: 60px;
+            text-align: center;
+        }
+
+        #text-content {
+            line-height: 1.9;
+            font-size: 1.1rem;
+            text-align: justify;
+            margin: 8px 0 20px 0;
+            touch-action: pan-y;
+            user-select: text;
+            -webkit-user-select: text;
+        }
+
+        #text-content .verse {
+            margin-bottom: 0.6rem;
+            padding-left: 0.5rem;
+        }
+
+        #text-content .verse-text {
+            display: inline;
+        }
+
+        /* ===== NOTE MARKER - cerc cu "i" poziționat mai sus ===== */
+        .note-marker {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #ff6b35;
+            font-size: 0.65rem;
+            font-weight: 900;
+            font-family: 'Georgia', serif;
+            font-style: italic;
+            cursor: pointer;
+            margin: 0 3px;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: rgba(255, 107, 53, 0.15);
+            border: 2.5px solid #ff6b35;
+            transition: all 0.25s ease;
+            text-shadow: 0 0 8px rgba(255, 107, 53, 0.2);
+            box-shadow: 0 0 12px rgba(255, 107, 53, 0.1);
+            position: relative;
+            top: -0.6em;
+            vertical-align: middle;
+            line-height: 1;
+            user-select: none;
+        }
+        .note-marker:hover {
+            background: rgba(255, 107, 53, 0.35);
+            transform: scale(1.15);
+            box-shadow: 0 0 24px rgba(255, 107, 53, 0.3);
+            border-color: #ff8a5c;
+        }
+        .note-marker:active {
+            transform: scale(0.9);
+        }
+
+        /* Tema deschisă */
+        body.light-theme .note-marker {
+            color: #c0392b;
+            border-color: #c0392b;
+            background: rgba(192, 57, 43, 0.12);
+            text-shadow: 0 0 8px rgba(192, 57, 43, 0.15);
+            box-shadow: 0 0 12px rgba(192, 57, 43, 0.08);
+        }
+        body.light-theme .note-marker:hover {
+            background: rgba(192, 57, 43, 0.28);
+            border-color: #e74c3c;
+            box-shadow: 0 0 24px rgba(192, 57, 43, 0.2);
+        }
+
+        /* Tema închisă */
+        body:not(.light-theme) .note-marker {
+            color: #ff8c42;
+            border-color: #ff8c42;
+            background: rgba(255, 140, 66, 0.15);
+            text-shadow: 0 0 12px rgba(255, 140, 66, 0.3);
+            box-shadow: 0 0 16px rgba(255, 140, 66, 0.15);
+        }
+        body:not(.light-theme) .note-marker:hover {
+            background: rgba(255, 140, 66, 0.35);
+            border-color: #ffa366;
+            box-shadow: 0 0 28px rgba(255, 140, 66, 0.35);
+        }
+
+        .note-popup {
+            display: none;
+            position: fixed;
+            top: 15%;
+            left: 5%;
+            right: 5%;
+            max-width: 520px;
+            margin: 0 auto;
+            background: #1a1a1a;
+            color: #f0f0f0;
+            padding: 28px 24px 24px 24px;
+            border-radius: 16px;
+            border: 2px solid #b8860b;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.95);
+            z-index: 999;
+            font-size: 1rem;
+            line-height: 1.7;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+        .note-popup.show {
+            display: block;
+            animation: fadeIn 0.25s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .note-popup .close-note {
+            float: right;
+            background: none;
+            border: none;
+            color: #b8860b;
+            font-size: 2rem;
+            cursor: pointer;
+            line-height: 1;
+            padding: 0 4px;
+        }
+        .note-popup .close-note:hover {
+            transform: scale(1.2);
+        }
+        .note-popup .note-label {
+            font-size: 0.8rem;
+            color: #b8860b;
+            margin-bottom: 6px;
+            font-weight: bold;
+        }
+        .note-popup .note-content {
+            margin-top: 4px;
+        }
+
+        .search-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 10, 10, 0.97);
+            z-index: 1000;
+            padding: 40px 20px;
+            flex-direction: column;
+            align-items: center;
+        }
+        .search-overlay.show {
+            display: flex;
+        }
+
+        .search-overlay .search-header {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .search-overlay input {
+            flex: 1;
+            padding: 12px 20px;
+            border-radius: 30px;
+            border: 1px solid #444;
+            background: #1a1a1a;
+            color: #e8e0d8;
+            font-size: 1.1rem;
+            font-family: inherit;
+            outline: none;
+        }
+        .search-overlay input:focus {
+            border-color: #b8860b;
+        }
+        .search-overlay .search-close {
+            background: none;
+            border: none;
+            color: #e8e0d8;
+            font-size: 2rem;
+            cursor: pointer;
+            padding: 0 12px;
+        }
+        .search-overlay .search-close:hover {
+            transform: scale(1.2);
+        }
+
+        .search-overlay .search-results {
+            width: 100%;
+            max-width: 600px;
+            max-height: 70vh;
+            overflow-y: auto;
+            padding: 10px 0;
+        }
+
+        .search-overlay .search-result {
+            padding: 12px 16px;
+            border-bottom: 1px solid #333;
+            cursor: pointer;
+            transition: 0.2s;
+            border-radius: 8px;
+        }
+        .search-overlay .search-result:hover {
+            background: #1a1a1a;
+        }
+        .search-overlay .search-result .result-book {
+            color: #b8860b;
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+        .search-overlay .search-result .result-text {
+            margin-top: 4px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        .search-overlay .search-result .result-text .highlight {
+            background: rgba(184, 134, 11, 0.4);
+            padding: 1px 4px;
+            border-radius: 3px;
+        }
+        .search-overlay .search-no-results {
+            color: #666;
+            text-align: center;
+            padding: 40px 0;
+            font-size: 1.1rem;
+        }
+
+        .progress-container {
+            position: fixed;
+            bottom: 64px;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: #1a1a1a;
+            z-index: 100;
+            display: none;
+        }
+        .progress-container.visible {
+            display: block;
+        }
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: #b8860b;
+            transition: width 0.3s ease;
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: #141414;
+            border-top: 1px solid #333;
+            padding: 10px 16px;
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 100;
+            gap: 12px;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.5);
+        }
+        .bottom-nav.visible {
+            display: flex;
+        }
+
+        .bottom-nav button {
+            background: #222;
+            border: 1px solid #444;
+            color: #e8e0d8;
+            padding: 8px 16px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: 0.2s;
+            font-family: inherit;
+            min-width: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        .bottom-nav button:hover:not(:disabled) {
+            background: #333;
+        }
+        .bottom-nav button:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .bottom-nav .chapter-indicator {
+            font-size: 1rem;
+            color: #b8860b;
+            font-weight: bold;
+            text-align: center;
+            min-width: 100px;
+        }
+
+        .bottom-nav .nav-arrows {
+            display: flex;
+            gap: 8px;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 0 12px 110px 12px;
+            }
+            .top-bar {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
+            }
+            .top-left {
+                justify-content: space-between;
+            }
+            .controls {
+                justify-content: center;
+            }
+            .menu-item {
+                font-size: 1.2rem;
+                padding: 14px 12px;
+            }
+            .chapter-header .book-title {
+                font-size: 1.4rem;
+            }
+            .chapter-header .chapter-sub {
+                font-size: 1rem;
+            }
+            #text-content {
+                font-size: 1rem;
+            }
+            #text-content .verse {
+                padding-left: 0.5rem;
+            }
+            .chapter-nav {
+                padding: 8px 12px;
+                gap: 8px;
+            }
+            .chapter-nav button {
+                padding: 4px 12px;
+                font-size: 1rem;
+            }
+            .note-popup {
+                top: 10%;
+                padding: 20px 16px;
+                max-height: 80vh;
+            }
+            .bottom-nav {
+                padding: 8px 12px;
+                gap: 8px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            .bottom-nav button {
+                padding: 6px 12px;
+                font-size: 0.95rem;
+                min-width: 50px;
+            }
+            .bottom-nav .chapter-indicator {
+                min-width: 70px;
+                font-size: 0.85rem;
+            }
+            .progress-container {
+                bottom: 58px;
+            }
+            .search-overlay {
+                padding: 20px 12px;
+            }
+            .search-overlay input {
+                font-size: 1rem;
+                padding: 10px 16px;
+            }
+            .note-marker {
+                width: 20px;
+                height: 20px;
+                font-size: 0.6rem;
+                border-width: 2px;
+                top: -0.5em;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .chapter-nav button {
+                padding: 4px 8px;
+                font-size: 0.9rem;
+            }
+            .chapter-select {
+                font-size: 0.85rem;
+                padding: 4px 8px;
+                min-width: 60px;
+            }
+            .bottom-nav button {
+                padding: 4px 10px;
+                font-size: 0.85rem;
+                min-width: 40px;
+            }
+            .bottom-nav .chapter-indicator {
+                min-width: 50px;
+                font-size: 0.75rem;
+            }
+            .note-marker {
+                width: 18px;
+                height: 18px;
+                font-size: 0.55rem;
+                border-width: 2px;
+                top: -0.45em;
+                margin: 0 2px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- POPUP NOTE -->
+<div id="notePopup" class="note-popup">
+    <button class="close-note" id="closeNoteBtn">&times;</button>
+    <div class="note-label">📖 Notă explicativă</div>
+    <div class="note-content" id="noteContent"></div>
+</div>
+
+<!-- SEARCH OVERLAY -->
+<div class="search-overlay" id="searchOverlay">
+    <div class="search-header">
+        <input type="text" id="searchInput" placeholder="🔍 Caută în Evanghelii..." autofocus>
+        <button class="search-close" id="searchCloseBtn">✕</button>
+    </div>
+    <div class="search-results" id="searchResults"></div>
+</div>
+
+<!-- BARA DE PROGRES -->
+<div class="progress-container" id="progressContainer">
+    <div class="progress-fill" id="progressFill"></div>
+</div>
+
+<!-- TOP BAR -->
+<div class="top-bar">
+    <div class="top-left">
+        <button class="back-btn" id="backBtn" title="Înapoi la listă">‹</button>
+        <span class="title">📖 Evangheliile</span>
+    </div>
+    <div class="controls">
+        <button class="scroll-marker-btn" id="scrollMarkerBtn" title="Salvează poziția (dublu click = șterge)">
+            ☆
+            <span class="tooltip" id="markerTooltip">Salvează poziția</span>
+        </button>
+        <button id="searchBtn" title="Caută">🔍</button>
+        <button id="themeToggle" title="Comută tema">🌙</button>
+        <button id="fontDecrease" title="Micșorează font">A−</button>
+        <span class="font-size-display" id="fontSizeDisplay">100%</span>
+        <button id="fontIncrease" title="Mărește font">A+</button>
+    </div>
+</div>
+
+<!-- MENIU -->
+<div id="menu-page">
+    <div class="menu-item" data-book="matei">
+        <span class="book-icon">📕</span> Evanghelia după Matei
+    </div>
+    <div class="menu-item" data-book="marcu">
+        <span class="book-icon">📗</span> Evanghelia după Marcu
+    </div>
+    <div class="menu-item" data-book="luca">
+        <span class="book-icon">📘</span> Evanghelia după Luca
+    </div>
+    <div class="menu-item" data-book="ioan">
+        <span class="book-icon">📙</span> Evanghelia după Ioan
+    </div>
+</div>
+
+<!-- READER -->
+<div id="reader-page">
+    <div class="chapter-header">
+        <div class="book-title" id="bookTitleDisplay">Evanghelia după Matei</div>
+        <div class="chapter-sub" id="chapterSubDisplay">Capitolul 1 | Genealogia și nașterea lui Iisus Hristos</div>
+    </div>
+
+    <div class="chapter-nav">
+        <button id="prevChapterBtn" title="Capitolul anterior">◀</button>
+        <select class="chapter-select" id="chapterSelect"></select>
+        <span class="chapter-info" id="chapterInfo">1 / 1</span>
+        <button id="nextChapterBtn" title="Capitolul următor">▶</button>
+    </div>
+
+    <div id="text-content"></div>
+</div>
+
+<!-- NAVIGARE JOS -->
+<div class="bottom-nav" id="bottomNav">
+    <div class="nav-arrows">
+        <button id="bottomPrevBtn" title="Capitolul anterior">◀</button>
+    </div>
+    <span class="chapter-indicator" id="bottomChapterIndicator">Capitolul 1</span>
+    <div class="nav-arrows">
+        <button id="bottomNextBtn" title="Capitolul următor">▶</button>
+    </div>
+</div>
+
+<script>
+    // ================================================================
+    // ================================================================
+
+    const bibleData = {
+        matei: {
+            title: "Evanghelia după Matei",
+            chapters: [
+                // Capitolul 1 - textul(Versiunea Anania)
+                `1. Cartea nașterii[[În textul de faţă, cuvântul grecesc génesis înseamnă şi arbore genealogic, şi naştere. Capitolul le cuprinde pe amândouă, dar centrul naraţiei este naşterea lui Hristos.]] lui Iisus Hristos, fiul lui David, fiul lui Avraam.
+2. Avraam i-a dat naștere lui Isaac; Isaac i-a dat naștere lui Iacob; Iacob le-a dat naștere lui Iuda și fraților lui;
+3. Iuda le-a dat naștere, din Tamar, lui Fares și lui Zara; Fares i-a dat naștere lui Hețron; Hețron i-a dat naștere lui Aram;
+4. Aram i-a dat naștere lui Aminadab; Aminadab i-a dat naștere lui Naason; Naason i-a dat naștere lui Salmon;
+5. Salmon i-a dat naștere, din Rahab, lui Booz; Booz i-a dat naștere, din Rut, lui Obed; Obed i-a dat naștere lui Iesei;
+6. Iesei i-a dat naștere lui David, regele; David i-a dat naștere lui Solomon, din femeia lui Urie;
+7. Solomon i-a dat naștere lui Roboam; Roboam i-a dat naștere lui Abia; Abia i-a dat naștere lui Asa;
+8. Asa i-a dat naștere lui Iosafat; Iosafat i-a dat naștere lui Ioram; Ioram i-a dat naștere lui Ozia;
+9. Ozia i-a dat naștere lui Iotam; Iotam i-a dat naștere lui Ahaz; Ahaz i-a dat naștere lui Iezechia;
+10. Iezechia i-a dat naștere lui Manase; Manase i-a dat naștere lui Amon; Amon i-a dat naștere lui Iosia;
+11. Iosia le-a dat naștere lui Iehonia și fraților lui, la strămutarea în Babilon.
+12. După strămutarea în Babilon, Iehonia i-a dat naștere lui Salatiel; Salatiel i-a dat naștere lui Zorobabel;
+13. Zorobabel i-a dat naștere lui Abiud; Abiud i-a dat naștere lui Eliachim; Eliachim i-a dat naștere lui Azor;
+14. Azor i-a dat naștere lui Sadoc; Sadoc i-a dat naștere lui Ahim; Ahim i-a dat naștere lui Eliud;
+15. Eliud i-a dat naștere lui Eleazar; Eleazar i-a dat naștere lui Matan; Matan i-a dat naștere lui Iacob;
+16. Iacob i-a dat naștere lui Iosif, bărbatul[[Soţ legal, menit s’o reprezinte atât pe ea cât şi pe Fiul ei în faţa autorităţilor şi a societăţii.]] Mariei, cea din care S-a născut Iisus, Ce Se cheamă Hristos.
+17. Așadar, întru totul, de la Avraam până la David sunt paisprezece neamuri[[Generaţii.]]; de la David până la strămutarea în Babilon sunt paisprezece neamuri; iar de la strămutarea în Babilon până la Hristos sunt paisprezece neamuri.
+18. Dar[[Acest episod se deschide prin particula adversativă de = dar, adică: spre deosebire de ceea ce (sau de cum) a fost înainte. Este folosită şi la FA 5, 1 spre a marca incorectitudinea soţilor Anania şi Safira în contrast cu cinstea totală a lui Barnaba. În cazul de faţă, intenţia Evanghelistului este aceea de a demonstra că dacă strămoşii după trup ai lui Iisus s’au născut în chip firesc, naşterea Sa a avut un caracter suprafiresc, aşa cum e istorisită mai jos.]] nașterea lui Iisus Hristos, astfel a fost: Fiind Maria, mama Sa, logodită cu Iosif, mai înainte de a fi ei laolaltă ea s-a aflat pe sine având în pântece de la Duhul Sfânt.
+19. Iar Iosif, bărbatul ei, drept fiind[[Cu respectul legilor şi al adevărului; inocent.]] și nevrând s-o dea el în vileag, a vrut s-o lase pe ascuns.
+20. Și cugetând el acestea, iată îngerul Domnului i s-a arătat în vis, grăind: „Iosife, fiul lui David, nu te teme s-o iei pe Maria drept femeia ta[[La Evrei, logodna nu era o simplă promisiune, ci un legământ sacru, cu putere legală.]], fiindcă ceea ce s-a zămislit într-însa este de la Duhul Sfânt;
+21. ea va naște Fiu, Căruia tu Îi vei pune numele Iisus, căci El va mântui pe poporul Său de păcatele lor[[Numele Iisus înseamnă „Domnul este (Cel ce dă) mântuirea”.]]“.
+22. Iar acestea toate s-au făcut ca să se plinească ceea ce s-a spus de Domnul prin profetul ce zice:
+23. Iată, Fecioara va purta în pântece și va naște Fiu și-L vor chema cu numele de Emanuel, care se tâlcuiește: Cu noi este Dumnezeu.
+24. Și trezindu-se Iosif din somn, a făcut așa cum i-a poruncit îngerul Domnului și a luat-o la sine pe femeia sa.
+25. Și nu a cunoscut-o până ce ea L-a născut pe Fiul ei [[În limbajul biblic: a cunoaşte (o femeie): a avea legături trupeşti (cu ea). Evanghelistul e preocupat aici numai de faptul că Iisus S’a născut din Fecioară (prin zămislirea de la Duhul Sfânt). Textul de faţă nu atestă în mod explicit pururea-fecioria Mariei, aşa cum ea reiese din restul Evangheliilor şi din tradiţia Bisericii, dar nici nu o infirmă. Adverbul-prepoziţie héos = până, până ce, până când, are şi semnificaţia de continuitate, perpetuitate (Bailly). Verbul care o precede, ouk egínosken = nu a cunoscut-o (redat în limbile moderne prin perfectul compus), este în original imperfectul durabil (Osty), adică exprimă o acţiune care nu se termină, care nu are un capăt. Compară pe héos de aici cu cel din 2 Rg 6, 23: Micol „n’a avut copii până în ziua morţii ei”; Ps 109, 1: „Şezi de-a dreapta Mea până ce voi pune pe vrăjmaşii Tăi aşternut pi cioarelor Tale”; Mt 28, 20: „Iată, Eu cu voi sunt în toate zilele, până la sfârşitul veacului”; Lc 2, 37: Proorociţa Ana „văduvă până la optzeci şi patru de ani”. În toate cazurile, héos nu semnifică un capăt al acţiunii sau situaţiei care-l angajează (că adică Micol ar fi avut copii după moarte, că Fiul n’ar mai fi şezut de-a dreapta Tatălui după înfrângerea vrăjmaşilor, că Iisus n’ar mai fi cu apostolii după sfârşitul veacului, că proorociţa Ana s’ar fi recăsătorit după vârsta de 84 de ani), de unde rezultă fără echivoc că textul de faţă nu implică o legătură maritală între Iosif şi Maria, nici înainte şi nici după naşterea lui Iisus.]] Și I-au pus Acestuia numele Iisus..`,
+
+ `1. Iar dacă-n zilele regelui Irod[[Irod cel Mare (Idumeul). Rege al Iudeii şi vasal al Romei. Ocupând tronul prin uzurpare şi crimă, principala lui grijă, de-a lungul celor 33 de ani de domnie, a fost aceea de a nu şi-l pierde; bântuit de bănuieli, nu a ezitat să-şi ucidă doi din cei zece fii ai săi.]] S-a născut Iisus în Betleemul Iudeii, iată magii[[Înţelepţi ce se ocupau cu astrologia; după tradiţie, din părţile Persiei sau Arabiei.]] de la Răsărit au venit în Ierusalim, întrebând:
+2. „Unde este Cel ce S-a născut rege al iudeilor?[[Noul-Născut era definit drept rege prin naştere (în fapt, descendent al lui David), ceea ce va stârni reacţia lui Irod.]] Că-n Răsărit văzutu-I-am steaua și am venit să I ne închinăm“.
+3. Și auzind acestea, regele Irod s-a tulburat, și tot Ierusalimul împreună cu el.
+4. Și adunând pe toți arhiereii și cărturarii poporului, i-a întrebat: „Unde este să Se nască Hristos?“
+5. Iar ei i-au zis: „În Betleemul Iudeii, că așa este scris prin profetul:
+6. Și tu, Betleeme din pământul lui Iuda, nicicum nu ești mai mic între căpeteniile lui Iuda, căci din tine va ieși Cârmuitorul Care-l va păstori pe poporul Meu Israel“.
+7. Atunci Irod i-a chemat în taină pe magi și a aflat limpede de la ei vremea când li se arătase steaua.
+8. Și trimițându-i la Betleem, le-a zis: „Mergeți și cercetați cu de-amănuntul despre prunc și dacă-l veți afla, dați-mi și mie de veste, pentru ca să vin și eu și să mă închin lui“.
+9. Iar ei, ascultându-l pe rege, au plecat; și iată, steaua pe care o văzuseră în Răsărit mergea înaintea lor, până ce a venit și a stat deasupra locului unde era Pruncul.
+10. Și văzând ei steaua, s-au bucurat cu bucurie mare foarte.
+11. Și intrând în casă, L-au văzut pe Prunc împreună cu Maria, mama Sa; și căzând la pământ, I s-au închinat; și deschizându-și vistieriile, I-au adus daruri: aur, tămâie și smirnă.[[După Sfinţii Părinţi, trei daruri, trei simboluri: aurul, regalitatea; tămâia, dumnezeirea; smirna, suferinţa prin Patimi.]]
+12. Dar luând prin vis înștiințare să nu se mai întoarcă la Irod, pe altă cale s-au dus în țara lor.
+13. Iar după ce au plecat ei, iată îngerul Domnului i se arătă în vis lui Iosif, zicând: „Ridică-te, ia Pruncul și pe maica Sa și fugi în Egipt și stai acolo până când îți voi spune eu, fiindcă Irod vrea să caute Pruncul ca să-L omoare“.
+14. Și ridicându-se Iosif, i-a luat în timpul nopții pe Prunc și pe maica Sa și a plecat în Egipt.
+15. Și au stat acolo până la moartea lui Irod, ca să se plinească cuvântul spus de Domnul prin profetul ce zice: Din Egipt L-am chemat pe Fiul Meu.
+16. Iar Irod, văzând că fusese amăgit de magi, s-a mâniat foarte și, trimițând, i-a ucis pe toți pruncii care erau în Betleem și-n toate hotarele lui, de doi ani și mai în jos, după timpul pe care îl aflase de la magi.
+17. Atunci s-a plinit cuvântul spus prin Ieremia profetul:
+18. Glas în Rama s-a auzit, plângere și tânguire multă, Rahela-și plânge copiii și nu vrea să se mângâie, pentru că nu mai sunt.
+19. După moartea lui Irod, iată îngerul Domnului i s-a arătat în vis lui Iosif, în Egipt,
+20. zicându-i: „Ridică-te, ia Pruncul și pe maica Sa și mergi în țara lui Israel, căci au murit cei ce căutau viața Pruncului“.
+21. Iar el, ridicându-se, a luat Pruncul și pe maica Sa și a venit în țara lui Israel.
+22. Și auzind că Arhelau domnește în Iudeea, în locul lui Irod, tatăl său, s-a temut să meargă acolo și, luând poruncă prin vis, s-a dus în părțile Galileii.
+23. Și a venit și a locuit în orașul numit Nazaret, ca să se plinească ceea ce s-a spus prin profeți, că Nazarinean Se va chema.`
+            ],
+            subtitles: [
+                "Genealogia și nașterea lui Iisus Hristos",
+                 "Magii de la Răsărit.Fuga în Egipt.Irod ucide pruncii.Întoarcerea din Egipt și așezarea în Nazaret."
+            ]
+
+        },
+
+        marcu: {
+            title: "Evanghelia după Marcu",
+            chapters: [
+                // Capitolul 1 - demonstrativ
+                `1. Începutul Evangheliei lui Iisus Hristos, Fiul lui Dumnezeu.
+2. După cum este scris în profetul Isaia: Iată, Eu îl trimit înaintea feței Tale pe îngerul Meu, care-ți va pregăti calea;
+3. glasul celui ce strigă în pustie: Gătiți calea Domnului, drepte faceți-I cărările,
+4. Ioan boteza în pustie, propovăduind botezul pocăinței spre iertarea păcatelor.
+5. Și ieșeau spre el tot ținutul Iudeii și toți cei din Ierusalim și se botezau de către el în râul Iordan, mărturisindu-și păcatele.
+6. Și Ioan era îmbrăcat în haină de păr de cămilă, cu cingătoare de piele împrejurul mijlocului și se hrănea cu lăcuste și miere sălbatică.
+7. Și propovăduia, zicând: „Vine în urma mea Cel ce este mai tare decât mine, Căruia nu sunt vrednic, plecându-mă, să-I dezleg cureaua încălțămintelor.
+8. Eu v-am botezat cu apă, dar el vă va boteza cu Duh Sfânt“.
+9. Și în zilele acelea, Iisus a venit din Nazaretul Galileii și S-a botezat în Iordan de către Ioan.
+10. Și îndată, ieșind din apă, a văzut cerurile deschise și Duhul ca un porumbel pogorându-Se peste El.
+11. Și glas s-a făcut din ceruri: „Tu ești Fiul Meu Cel iubit, întru Tine am binevoit“.
+12. Și îndată Duhul L-a scos în pustie.
+13. Și a fost în pustie patruzeci de zile, fiind ispitit de Satana. Și era împreună cu fiarele, și îngerii îi slujeau.
+14. După ce Ioan a fost întemnițat, Iisus a venit în Galileea, propovăduind Evanghelia împărăției lui Dumnezeu
+15. și zicând: „Plinitu-s-a vremea și împărăția lui Dumnezeu s-a apropiat. Pocăiți-vă și credeți în Evanghelie!“
+16. Și umblând pe lângă Marea Galileii, a văzut pe Simon și pe Andrei, fratele lui Simon, aruncându-și mrejele în mare, că erau pescari.
+17. Și le-a zis Iisus: „Veniți după Mine și vă voi face să fiți pescari de oameni!“
+18. Și lăsându-și de-ndată mrejele, au mers după El.
+19. Și mergând puțin mai departe, i-a văzut pe Iacob al lui Zevedeu și pe Ioan, fratele acestuia, care erau și ei în corabie, dregându-și mrejele.
+20. Și i-a chemat îndată. Iar ei, lăsându-l pe tatăl lor Zevedeu în corabie împreună cu lucrătorii, s-au dus după El.
+21. Și au venit în Capernaum. Și îndată intrând El sâmbăta în sinagogă, îi învăța.
+22. Și erau uimiți de învățătura Lui, că El îi învăța ca Unul Care are putere, iar nu în felul cărturarilor.
+23. Și era atunci în sinagoga lor un om cu duh necurat care striga tare,
+24. zicând: „Ce ai cu noi, Iisuse Nazarinene? Ai venit să ne pierzi? Te știm cine ești: Sfântul lui Dumnezeu“.
+25. Și Iisus l-a certat, zicând: „Taci și ieși din el!“
+26. Și, scuturându-l duhul cel necurat și strigând cu glas mare, a ieșit din el.
+27. Și toți s-au înspăimântat, încât se întrebau între ei, zicând: „Ce este aceasta?: învățătură nouă și cu putere; că El și duhurilor necurate le poruncește, și ele i se supun“.
+28. Și îndată s-a răspândit vestea despre El pretutindeni, în tot ținutul Galileii.
+29. Și după ce au ieșit din sinagogă, au venit în casa lui Simon și a lui Andrei, cu Iacob și cu Ioan.
+30. Iar soacra lui Simon zăcea aprinsă de friguri; și îndată I-au vorbit despre ea.
+31. Și apropiindu-Se, a ridicat-o apucând-o de mână. Și au lăsat-o frigurile și ea îi slujea.
+32. Iar când s-a făcut seară și soarele apusese, au adus la El pe toți bolnavii și demonizații,
+33. și toată cetatea era adunată la ușă.
+34. Și i-a tămăduit pe mulți care pătimeau de felurite boli, și demoni mulți a scos. Și pe demoni nu-i lăsa să vorbească, pentru că ei știau că El este Hristos.
+35. Și a doua zi, sculându-Se foarte de noapte, a ieșit și S-a dus într-un loc pustiu și Se ruga acolo.
+36. Iar Simon și cei ce erau cu el s-au dus după Dânsul.
+37. Și, aflându-L, I-au zis: „Toți Te caută“.
+38. Iar El le-a zis: „Să mergem în altă parte, prin cetățile și satele învecinate, ca să propovăduiesc și acolo, că pentru aceasta am venit“.
+39. Și a propovăduit în sinagogile lor, în toată Galileea, scoțându-i pe demoni.
+40. Și a venit la El un lepros, rugându-L și îngenunchind și zicând: „Dacă vrei, Tu poți să mă curățești“.
+41. Și făcându-I-Se milă, și-a întins mâna și S-a atins de el și i-a zis: „Vreau, curățește-te!“
+42. Și îndată s-a depărtat lepra de pe el și s-a curățit.
+43. Și dându-i poruncă aspră, îndată l-a scos afară
+44. și i-a zis: „Ia seama, să nu spui nimănui nimic, ci mergi de te arată preotului, iar pentru curățirea ta să duci cele rânduite de Moise, să le fie lor mărturie“.
+45. Dar el, ieșind, a început să spună multe-n gura mare și să răspândească vorba, așa încât Iisus nu mai putea să intre pe față în cetate, ci stătea afară, în locuri pustii; și veneau la El de pretutindeni.`
+            ],
+            subtitles: ["Ioan Botezătorul și predica sa.Botezul lui Iisus.Ispitirea în pustie.Începutul predicii lui Iisus în Galileea.Chemarea primilor apostoli.Primele vindecări în Galileea.Vindecarea soacrei lui Petru și alte tămăduiri.Curățirea unui lepros."]
+        },
+        luca: {
+            title: "Evanghelia după Luca",
+            chapters: [
+                // Capitolul 1 
+                `1. Pentru că mulți au încercat să alcătuiască o istorisire a faptelor ce s-au adeverit printre noi,
+2. așa cum ni le-au predat cei care dintru-nceput le-au văzut și au fost slujitori ai Cuvântului,
+3. tot astfel și eu, după ce pe toate le-am urmărit de la-nceput cu de-amănuntul, m-am gândit că e bine să ți le scriu pe rând, Preaputernice Teofile,
+4. pentru ca tu să cunoști temeinicia învățăturilor pe care le-ai primit.
+5. Fost-a în zilele lui Irod, regele Iudeii, un preot cu numele Zaharia, din ceata preoțească a lui Abia; iar femeia lui era din fiicele lui Aaron și numele ei era Elisabeta.
+6. Și amândoi erau drepți înaintea lui Dumnezeu, umblând fără prihană în toate poruncile și rânduielile Domnului.
+7. Și nu aveau copii, deoarece Elisabeta era stearpă și amândoi erau înaintați în zilele lor.
+8. Și a fost că pe când Zaharia slujea înaintea lui Dumnezeu în rândul cetei sale,
+9. după rânduiala preoției i-au ieșit sorții să intre în templul Domnului și să tămâieze.
+10. Iar la ceasul tămâierii toată mulțimea poporului era afară, rugându-se.
+11. Și îngerul Domnului i s-a arătat stând de-a dreapta altarului tămâierii.
+12. Și, văzându-l, Zaharia s-a tulburat și frică a căzut peste el.
+13. Iar îngerul i-a grăit: „Nu te teme, Zaharia, fiindcă rugăciunea ți-a fost ascultată și Elisabeta, femeia ta, îți va naște un fiu și-i vei pune numele Ioan.
+14. Și-ți va fi el bucurie și veselie, și mulți se vor bucura de nașterea lui.
+15. Că mare va fi el înaintea Domnului; nici vin și nici băutură tare nu va bea, și încă din pântecele mamei sale se va umple de Duh Sfânt;
+16. Și pe mulți din fiii lui Israel îi va întoarce la Domnul, Dumnezeul lor;
+17. Și Lui îi va merge el înainte cu duhul și cu puterea lui Ilie, ca să întoarcă inimile părinților spre copii și pe cei neascultători la înțelepciunea drepților, ca să-i gătească Domnului popor pregătit“.
+18. Și a zis Zaharia către înger: „După ce voi cunoaște aceasta? Că eu sunt bătrân, iar femeia mea, înaintată în zilele ei“.
+19. Și răspunzând îngerul, i-a zis: „Eu sunt Gavriil, cel ce stă în fața lui Dumnezeu. Și sunt trimis să grăiesc către tine și să-ți binevestesc acestea.
+20. Și pentru că n-ai crezut în cuvintele mele, care se vor plini la vremea lor, iată vei fi mut și nu vei putea vorbi până-n ziua când vor fi acestea“.
+21. Și poporul îl aștepta pe Zaharia și se mira că întârzie în templu.
+22. Și când a ieșit, nu putea să vorbească. Și ei au înțeles că vedenie a văzut în templu; și el le făcea semne și a rămas mut.
+23. Și când s-au împlinit zilele slujirii lui, s-a dus la casa sa.
+24. Iar după aceste zile, Elisabeta, femeia lui, a zămislit; și vreme de cinci luni s-a tăinuit, zicându-și:
+25. „Că așa mi-a făcut mie Domnul în zilele în care a socotit să-mi ridice ocara de printre oameni“.
+26. Iar în a șasea lună, trimis a fost de la Dumnezeu îngerul Gavriil într-o cetate din Galileea, al cărei nume era Nazaret,
+27. la o fecioară logodită cu un bărbat care se chema Iosif, din casa lui David; iar numele fecioarei era Maria.
+28. Și intrând îngerul la dânsa, i-a zis: „Bucură-te, ceea ce ești plină de har, Domnul este cu tine. Binecuvântată ești tu între femei!“
+29. Iar ea, văzându-l, s-a tulburat de cuvântul lui și cugeta: „Ce fel de închinare poate fi aceasta?...“.
+30. Și îngerul i-a zis: „Nu te teme, Marie, fiindcă ai aflat har la Dumnezeu.
+31. Și iată-n pântecele tău vei zămisli și vei naște Fiu și numele Lui îl vei chema Iisus.
+32. Acesta mare va fi și Fiul Celui-Preaînalt Se va chema și Domnul Dumnezeu îi va da tronul lui David, părintele Său,
+33. Și va împărăți peste casa lui Iacob în veci și împărăția Lui nu va avea sfârșit“.
+34. Și a zis Maria către înger: „Cum va fi aceasta, de vreme ce eu nu știu de bărbat?“
+35. Și răspunzând îngerul, i-a zis: „Duhul Sfânt Se va pogorî peste tine și puterea Celui-Preaînalt te va umbri; pentru aceea și Sfântul Care Se va naște din tine Fiul lui Dumnezeu Se va chema.
+36. Și iată, Elisabeta, rudenia ta, a zămislit și ea fiu la bătrânețea ei, și aceasta este a șasea lună pentru ea, cea numită stearpă.
+37. Că la Dumnezeu nimic nu este cu neputință“.
+38. Iar Maria a zis: „Iată, roaba Domnului. Fie mie după cuvântul tău!“ și îngerul a plecat de la dânsa.
+39. Și în zilele acelea, sculându-se Maria, s-a dus în grabă în ținutul muntos, într-o cetate a lui Iuda,
+40. Și a intrat în casa lui Zaharia și i s-a închinat Elisabetei.
+41. Iar când a auzit Elisabeta închinarea Mariei, săltat-a pruncul în pântecele ei și s-a umplut Elisabeta de Duh Sfânt,
+42. Și a strigat cu glas mare și a zis: „Binecuvântată ești tu între femei și binecuvântat este rodul pântecelui tău.
+43. Și de unde mie aceasta, să vină la mine maica Domnului meu?
+44. Că iată, de cum a ajuns glasul închinării tale la urechile mele, săltat-a pruncul de bucurie în pântecele meu.
+45. Și fericită este aceea care a crezut că se vor plini cele spuse ei de la Domnul“.
+46. Și a zis Maria: „Mărește, suflete al meu, pe Domnul,
+47. Și să se bucure duhul meu de Dumnezeu, Mântuitorul meu,
+48. că El a căutat spre smerenia roabei Sale; că, iată, de acum mă vor ferici toate neamurile;
+49. că mi-a făcut mie mărire Cel-Puternic – și sfânt e numele Lui –
+50. și mila Lui în neam și în neam spre cei ce se tem de El.
+51. Făcut-a faptă tare cu brațul Său, risipit-a pe cei mândri în cugetul inimii lor;
+52. coborât-a pe cei puternici de pe tronuri și i-a înălțat pe cei smeriți,
+53. pe cei flămânzi i-a umplut de bunătăți, iar pe cei bogați i-a scos afară cu mâinile goale.
+54. Sprijinit-a pe Israel, sluga Sa, ca să-I pomenească mila,
+55. așa cum le-a grăit părinților noștri, lui Avraam și seminției lui până-n veac“.
+56. Și a rămas Maria împreună cu ea ca la trei luni; și s-a întors la casa ei.
+57. Iar Elisabetei i s-a împlinit vremea să nască și a născut un fiu.
+58. Și au auzit vecinii și rudele ei că Domnul și-a mărit mila față de ea; și cu ea se bucurau împreună.
+59. Și a fost că în ziua a opta au venit să-l taie-mprejur pe prunc; și voiau să-l numească Zaharia, cu numele tatălui său.
+60. Și răspunzând, mama sa a zis: „Nu!; ci Ioan se va chema“.
+61. Și au zis către ea: „În rudenia ta nu e nimeni care să se cheme cu numele acesta...“.
+62. Și i-au făcut semn tatălui său, cum ar vrea el să fie numit.
+63. Și cerând o tăbliță, el a scris: „Numele lui este Ioan“. Și toți s-au mirat.
+64. Și îndată gura și limba i s-au deschis; și vorbea, binecuvântând pe Dumnezeu.
+65. Și frică i-a cuprins pe toți vecinii lor; și despre lucrurile acestea s-a vorbit în tot ținutul muntos al Iudeii.
+66. Și toți cei ce le-au auzit le puneau în inima lor, zicând: „Ce va fi oare copilul acesta?“... Că și mâna Domnului era cu el.
+67. Și Zaharia, tatăl său, s-a umplut de Duh Sfânt și a profețit, zicând:
+68. „Binecuvântat este Domnul, Dumnezeul lui Israel, că și-a cercetat poporul și l-a răscumpărat;
+69. Și putere mântuitoare ne-a ridicat din casa lui David, sluga Sa,
+70. așa cum a grăit prin gura sfinților Săi profeți din veac,
+71. mântuire de vrăjmașii noștri și din mâna tuturor celor ce ne urăsc,
+72. să facă milă cu părinții noștri și să-și amintească de legământul Său cel sfânt,
+73. de jurământul cu care i S-a jurat lui Avraam, părintele nostru;
+74. fiind noi astfel izbăviți din mâna vrăjmașilor, să ne dea nouă ca, fără frică,
+75. În fața Lui să-I slujim în sfințenie și-n dreptate în toate zilele vieții noastre.
+76. Iar tu, pruncule, profet al Celui-Preaînalt te vei chema, că vei merge înaintea feței Domnului ca să-I gătești căile,
+77. să-i dai poporului Său cunoștința mântuirii întru iertarea păcatelor lor,
+78. prin milostivirea milei Dumnezeului nostru, cu care Răsăritul-cel-de-Sus ne-a cercetat.
+79. Ca să-i lumineze pe cei ce șed în întuneric și în umbra morții și să îndrepte picioarele noastre pe calea păcii“.
+80. Iar copilul creștea și se întărea cu duhul. Și a fost în pustie până în ziua arătării lui către Israel.`
+            ],
+            subtitles: ["Adresare introductivă.Vestirea nașterii lui Ioan Botezătorul.Bunavestire.Maria la Elisabeta; cântarea Mariei.Nașterea lui Ioan Botezătorul."]
+        },
+        ioan: {
+            title: "Evanghelia după Ioan",
+            chapters: [
+                // Capitolul 1 - demonstrativ
+                `1. Întru-nceput era Cuvântul și Cuvântul era la Dumnezeu și Cuvântul Dumnezeu era.
+2. Acesta era dintru-nceput la Dumnezeu;
+3. toate printr-Însul s-au făcut și fără El nimic nu s-a făcut din ceea ce s-a făcut.
+4. Viață era într-Însul, și viața era lumina oamenilor;
+5. și lumina întru întuneric luminează și întunericul nu a cuprins-o.
+6. Fost-a om trimis de la Dumnezeu; numele lui era Ioan.
+7. Acesta spre mărturie a venit, să mărturisească despre Lumină, pentru ca toți să creadă prin el.
+8. Nu el era Lumina, ci să mărturisească despre Lumină.
+9. Lumina era cea adevărată, Care, venind în lume, luminează pe tot omul.
+10. În lume era și lumea printr-Însul s-a făcut, dar lumea nu L-a cunoscut.
+11. Întru ale Sale a venit, dar ai Săi nu L-au primit.
+12. Dar celor câți L-au primit, care cred întru numele Lui, le-a dat putere să devină fii ai lui Dumnezeu,
+13. cei ce nu din sânge, nici din voie trupească, nici din vrere bărbătească, ci de la Dumnezeu s-au născut.
+14. Și Cuvântul trup S-a făcut și S-a sălășluit întru noi; și noi văzutu-I-am slava ca pe slava Unuia-Născut din Tatăl, plin de har și de adevăr.
+15. Ioan mărturisea despre El și striga, zicând: „Acesta era Cel despre Care am zis: Cel ce vine după mine înaintea mea S-a plinit, fiindcă mai înainte de mine era.
+16. Și din plinătatea Lui noi toți am primit și har pentru har,
+17. căci legea prin Moise s-a dat, dar harul și adevărul prin Iisus Hristos au venit.
+18. Pe Dumnezeu nimeni niciodată nu L-a văzut; Fiul Cel Unul-Născut, Care este în sânul Tatălui, El L-a făcut cunoscut“.
+19. Și aceasta este mărturia lui Ioan când iudeii din Ierusalim au trimis la el preoți și leviți să-l întrebe: „Tu cine ești?“
+20. Și el a mărturisit și n-a tăgăduit; și a mărturisit: „Nu eu sunt Hristosul“.
+21. Și ei l-au întrebat: „Dar cine ești? Ești Ilie?“ Zis-a el: „Nu sunt“. „Ești Profetul?“ și a răspuns: „Nu“.
+22. Deci i-au zis: „Cine ești?, ca să dăm răspuns celor ce ne-au trimis; ce spui tu despre tine însuți?“
+23. El a zis: „Eu sunt glasul celui ce strigă în pustie: Îndreptați calea Domnului!, precum a spus profetul Isaia“.
+24. Și trimișii erau dintre farisei.
+25. Și l-au întrebat și i-au zis: „Dacă nu ești tu Hristosul, nici Ilie, nici Profetul, atunci de ce botezi?“
+26. Ioan le-a răspuns, zicând: „Eu botez cu apă; dar în mijlocul vostru Se află Acela pe Care voi nu-L știți,
+27. Cel ce vine după mine, Carele înaintea mea S-a plinit și Căruia eu nu sunt vrednic să-I dezleg cureaua încălțămintei“.
+28. Acestea se petreceau în Betania, dincolo de Iordan, unde boteza Ioan.
+29. A doua zi L-a văzut Ioan pe Iisus venind către el și I-a zis: „Iată Mielul lui Dumnezeu, Cel ce ridică păcatul lumii!
+30. Acesta este Cel despre Care eu spuneam: După mine vine un bărbat Care înaintea mea S-a plinit, fiindcă mai înainte de mine era.
+31. Și eu nu-L cunoșteam; dar pentru ca El să-i fie arătat lui Israel, de aceea am venit eu botezând cu apă“.
+32. Și Ioan a mărturisit, zicând: „Văzut-am Duhul ca pe un porumbel din cer pogorându-Se și cum a rămas peste El.
+33. Și eu nu-L cunoșteam, dar Cel ce m-a trimis să botez cu apă, Acela mi-a zis: Cel peste care vei vedea Duhul pogorându-Se și rămânând peste El, Acela este Cel ce botează cu Duh Sfânt.
+34. Și eu am văzut și am mărturisit că Acesta este Fiul lui Dumnezeu“.
+35. A doua zi iarăși stătea Ioan și doi dintre ucenicii săi;
+36. Și privindu-L pe Iisus, Care trecea, a zis: „Iată Mielul lui Dumnezeu!“
+37. Și cei doi ucenici l-au auzit când a spus acestea și I-au urmat lui Iisus.
+38. Iar Iisus, întorcându-Se și văzându-i că-L urmează, le-a zis: „Ce căutați?“ Iar ei I-au zis: „Rabbi – care se tâlcuiește: Învățătorule –, unde locuiești?“
+39. El le-a zis: „Veniți și veți vedea“. Au mers așadar și au văzut unde locuiește; și au rămas la El în ziua aceea. Și era ca la ceasul al zecelea.
+40. Unul din cei doi care auziseră de la Ioan și-I urmaseră lui Iisus era Andrei, fratele lui Simon Petru.
+41. Acesta l-a găsit întâi pe Simon, fratele său, și i-a zis: „Noi L-am aflat pe Mesia – ce se tâlcuiește: Hristos –“;
+42. Și l-a adus la Iisus. Iisus, privind la el, i-a zis: „Tu ești Simon, fiul lui Iona; tu te vei numi Chefa“ – ce se tâlcuiește: Petru.
+43. A doua zi a vrut să meargă în Galileea și l-a găsit pe Filip. Și i-a zis Iisus: „Urmează-Mi!“
+44. Iar Filip era din Betsaida, din cetatea lui Andrei și a lui Petru.
+45. Filip l-a găsit pe Natanael și i-a zis: „Noi L-am aflat pe Acela despre Care au scris Moise în lege și profeții, pe Iisus, fiul lui Iosif din Nazaret“.
+46. Și i-a zis Natanael: „Din Nazaret poate fi ceva bun?...“. Filip i-a zis: „Vino și vezi!“
+47. Iisus l-a văzut pe Natanael venind către Dânsul și a zis despre el: „Iată într-adevăr israelit întru care nu este vicleșug!“
+48. Natanael I-a zis: „De unde mă cunoști?“ A răspuns Iisus și i-a zis: „Mai înainte ca Filip să te fi chemat, te-am văzut când erai sub smochin“.
+49. Răspunsu-I-a Natanael: „Rabbi, Tu ești Fiul lui Dumnezeu, Tu ești Regele lui Israel!“
+50. Răspuns-a Iisus și i-a zis: „Pentru că ți-am spus că te-am văzut sub smochin, de aceea crezi? Mai mari decât acestea vei vedea“.
+51. Și i-a zis: „Adevăr, adevăr vă spun: De acum veți vedea cerul deschizându-se și pe îngerii lui Dumnezeu suindu-se și pogorându-se peste Fiul Omului!“`
+            ],
+            subtitles: ["Prolog: Dumnezeu-Cuvântul a devenit trup.Mărturia lui Ioan Botezătorul: „Iată Mielul lui Dumnezeu!“ Cei dintâi ucenici ai lui Iisus.Chemarea lui Filip și Natanael."]
+        }
+    };
+
+    // ================================================================
+    // RESTUL CODULUI (JavaScript)
+    // ================================================================
+
+    let currentBook = null;
+    let currentChapter = 0;
+    let currentFontSize = 100;
+    let isDarkTheme = true;
+
+    let scrollMarker = {
+        book: null,
+        chapter: null,
+        scrollY: 0,
+        elementId: null
+    };
+
+    let lastSearchQuery = '';
+    let noteCounter = 0;
+
+    const menuPage = document.getElementById('menu-page');
+    const readerPage = document.getElementById('reader-page');
+    const backBtn = document.getElementById('backBtn');
+    const bookTitleDisplay = document.getElementById('bookTitleDisplay');
+    const chapterSubDisplay = document.getElementById('chapterSubDisplay');
+    const textContent = document.getElementById('text-content');
+    const progressContainer = document.getElementById('progressContainer');
+    const progressFill = document.getElementById('progressFill');
+    const bottomNav = document.getElementById('bottomNav');
+    const scrollMarkerBtn = document.getElementById('scrollMarkerBtn');
+    const markerTooltip = document.getElementById('markerTooltip');
+    const themeToggle = document.getElementById('themeToggle');
+    const searchBtn = document.getElementById('searchBtn');
+    const searchOverlay = document.getElementById('searchOverlay');
+    const searchInput = document.getElementById('searchInput');
+    const searchResults = document.getElementById('searchResults');
+    const searchCloseBtn = document.getElementById('searchCloseBtn');
+    const fontIncrease = document.getElementById('fontIncrease');
+    const fontDecrease = document.getElementById('fontDecrease');
+    const fontSizeDisplay = document.getElementById('fontSizeDisplay');
+    const notePopup = document.getElementById('notePopup');
+    const noteContent = document.getElementById('noteContent');
+    const closeNoteBtn = document.getElementById('closeNoteBtn');
+    const chapterSelect = document.getElementById('chapterSelect');
+    const chapterInfo = document.getElementById('chapterInfo');
+    const prevChapterBtn = document.getElementById('prevChapterBtn');
+    const nextChapterBtn = document.getElementById('nextChapterBtn');
+    const bottomPrevBtn = document.getElementById('bottomPrevBtn');
+    const bottomNextBtn = document.getElementById('bottomNextBtn');
+    const bottomChapterIndicator = document.getElementById('bottomChapterIndicator');
+
+    function removeDiacritics(text) {
+        const diacritics = {
+            'ă': 'a', 'Ă': 'A', 'â': 'a', 'Â': 'A',
+            'î': 'i', 'Î': 'I', 'ș': 's', 'Ș': 'S',
+            'ț': 't', 'Ț': 'T', 'ş': 's', 'Ş': 'S', 'ţ': 't', 'Ţ': 'T'
+        };
+        return text.replace(/[ăâîșțĂÂÎȘȚşŞţŢ]/g, function(match) {
+            return diacritics[match] || match;
+        });
+    }
+
+    function renderTextWithNotes(verses) {
+        let html = '';
+        const verseLines = verses.split('\n').filter(line => line.trim() !== '');
+        
+        verseLines.forEach((verse, idx) => {
+            // Procesează notele: [[nota]] -> marker cu "i"
+            let processed = verse.replace(/\[\[([^\]]+)\]\]/g, (match, noteText) => {
+                noteCounter++;
+                const markerId = `note-${currentBook}-${currentChapter}-${idx}-${noteCounter}`;
+                return `<span class="note-marker" data-note="${encodeURIComponent(noteText)}" id="${markerId}">i</span>`;
+            });
+            
+            const pId = `p-${currentBook}-${currentChapter}-${idx}`;
+            html += `<div class="verse" id="${pId}">
+                        <span class="verse-text">${processed}</span>
+                     </div>`;
+        });
+        return html;
+    }
+
+    function loadChapter(bookKey, chapterIndex) {
+        const book = bibleData[bookKey];
+        if (!book) return;
+
+        const chapters = book.chapters;
+        if (chapterIndex < 0 || chapterIndex >= chapters.length) return;
+
+        currentBook = bookKey;
+        currentChapter = chapterIndex;
+        noteCounter = 0;
+
+        const chapterText = chapters[chapterIndex];
+        bookTitleDisplay.textContent = book.title;
+
+        const subtitles = book.subtitles || [];
+        chapterSubDisplay.textContent = `Capitolul ${chapterIndex + 1} | ${subtitles[chapterIndex] || ''}`;
+        bottomChapterIndicator.textContent = `Capitolul ${chapterIndex + 1}`;
+
+        textContent.innerHTML = renderTextWithNotes(chapterText);
+
+        populateChapterSelect(bookKey, chapterIndex);
+        chapterInfo.textContent = `${chapterIndex + 1} / ${chapters.length}`;
+
+        const isFirst = chapterIndex === 0;
+        const isLast = chapterIndex === chapters.length - 1;
+        prevChapterBtn.disabled = isFirst;
+        nextChapterBtn.disabled = isLast;
+        bottomPrevBtn.disabled = isFirst;
+        bottomNextBtn.disabled = isLast;
+
+        updateProgress(bookKey, chapterIndex);
+        attachNoteListeners();
+        updateMarkerUI();
+
+        menuPage.style.display = 'none';
+        readerPage.style.display = 'flex';
+        progressContainer.classList.add('visible');
+        bottomNav.classList.add('visible');
+        backBtn.classList.add('visible');
+
+        window.scrollTo(0, 0);
+
+        try {
+            localStorage.setItem('bibleLastRead', JSON.stringify({ book: bookKey, chapter: chapterIndex }));
+        } catch(e) {}
+    }
+
+    function populateChapterSelect(bookKey, selectedIndex) {
+        const book = bibleData[bookKey];
+        if (!book) return;
+
+        chapterSelect.innerHTML = '';
+        book.chapters.forEach((_, idx) => {
+            const option = document.createElement('option');
+            option.value = idx;
+            option.textContent = `Capitolul ${idx + 1}`;
+            if (idx === selectedIndex) {
+                option.selected = true;
+            }
+            chapterSelect.appendChild(option);
+        });
+    }
+
+    function updateProgress(bookKey, chapterIndex) {
+        const book = bibleData[bookKey];
+        if (!book) return;
+        const total = book.chapters.length;
+        const percent = ((chapterIndex + 1) / total) * 100;
+        progressFill.style.width = Math.min(percent, 100) + '%';
+    }
+
+    function attachNoteListeners() {
+        document.querySelectorAll('.note-marker').forEach(el => {
+            el.removeEventListener('click', noteClickHandler);
+            el.addEventListener('click', noteClickHandler);
+        });
+    }
+
+    function noteClickHandler(e) {
+        e.stopPropagation();
+        const noteText = decodeURIComponent(this.dataset.note || 'Notă lipsă');
+        showNote(noteText);
+    }
+
+    function showNote(text) {
+        noteContent.textContent = text;
+        notePopup.classList.add('show');
+    }
+
+    function hideNote() {
+        notePopup.classList.remove('show');
+    }
+
+    function updateMarkerUI() {
+        const hasMarker = scrollMarker.book !== null && scrollMarker.elementId !== null;
+        if (hasMarker) {
+            scrollMarkerBtn.textContent = '★';
+            scrollMarkerBtn.classList.add('active');
+            const bookName = getBookTitle(scrollMarker.book);
+            markerTooltip.textContent = `📍 ${bookName} ${scrollMarker.chapter + 1} - Revino la poziție (dublu click = șterge)`;
+        } else {
+            scrollMarkerBtn.textContent = '☆';
+            scrollMarkerBtn.classList.remove('active');
+            markerTooltip.textContent = 'Salvează poziția (dublu click = șterge)';
+        }
+    }
+
+    function getBookTitle(bookKey) {
+        const titles = { matei: 'Matei', marcu: 'Marcu', luca: 'Luca', ioan: 'Ioan' };
+        return titles[bookKey] || bookKey;
+    }
+
+    function saveScrollMarker() {
+        if (!currentBook) {
+            showNote('📖 Deschide o evanghelie pentru a salva o poziție.');
+            setTimeout(hideNote, 2000);
+            return;
+        }
+
+        const paragraphs = textContent.querySelectorAll('.verse');
+        let targetId = null;
+        for (const p of paragraphs) {
+            const rect = p.getBoundingClientRect();
+            if (rect.top >= 0 && rect.top < window.innerHeight / 2) {
+                targetId = p.id;
+                break;
+            }
+        }
+        if (!targetId && paragraphs.length > 0) {
+            targetId = paragraphs[0].id;
+        }
+
+        scrollMarker = {
+            book: currentBook,
+            chapter: currentChapter,
+            scrollY: window.scrollY,
+            elementId: targetId
+        };
+
+        updateMarkerUI();
+        try {
+            localStorage.setItem('bibleScrollMarker', JSON.stringify(scrollMarker));
+        } catch(e) {}
+
+        scrollMarkerBtn.style.transform = 'scale(1.4)';
+        setTimeout(() => {
+            scrollMarkerBtn.style.transform = 'scale(1)';
+        }, 300);
+
+        showNote('📌 Poziția a fost salvată! Apasă ★ pentru a reveni.');
+        setTimeout(hideNote, 1500);
+    }
+
+    function goToScrollMarker() {
+        if (!scrollMarker.book || !scrollMarker.elementId) {
+            showNote('📌 Derulează la o poziție și apasă ★ pentru a o salva.');
+            return;
+        }
+
+        const isSameChapter = (currentBook === scrollMarker.book && currentChapter === scrollMarker.chapter);
+        if (isSameChapter) {
+            scrollToMarkerElement();
+        } else {
+            loadChapter(scrollMarker.book, scrollMarker.chapter);
+            setTimeout(function() {
+                scrollToMarkerElement();
+            }, 400);
+        }
+    }
+
+    function scrollToMarkerElement() {
+        const target = document.getElementById(scrollMarker.elementId);
+        if (target) {
+            const topBarHeight = document.querySelector('.top-bar').offsetHeight || 60;
+            const targetPosition = target.getBoundingClientRect().top + window.scrollY - topBarHeight - 10;
+            window.scrollTo({ top: targetPosition, behavior: 'smooth' });
+            target.style.transition = 'background 0.3s';
+            target.style.background = 'rgba(184, 134, 11, 0.25)';
+            setTimeout(function() {
+                target.style.background = 'transparent';
+            }, 1500);
+        } else {
+            window.scrollTo({ top: scrollMarker.scrollY, behavior: 'smooth' });
+        }
+    }
+
+    function clearScrollMarker() {
+        scrollMarker = { book: null, chapter: null, scrollY: 0, elementId: null };
+        updateMarkerUI();
+        try {
+            localStorage.removeItem('bibleScrollMarker');
+        } catch(e) {}
+        showNote('🗑️ Markerul a fost șters.');
+        setTimeout(hideNote, 1500);
+    }
+
+    function showMenu() {
+        menuPage.style.display = 'flex';
+        readerPage.style.display = 'none';
+        progressContainer.classList.remove('visible');
+        bottomNav.classList.remove('visible');
+        backBtn.classList.remove('visible');
+        hideNote();
+        updateMarkerUI();
+    }
+
+    function goToPrevChapter() {
+        if (currentBook && currentChapter > 0) {
+            loadChapter(currentBook, currentChapter - 1);
+        }
+    }
+
+    function goToNextChapter() {
+        if (currentBook) {
+            const book = bibleData[currentBook];
+            if (book && currentChapter < book.chapters.length - 1) {
+                loadChapter(currentBook, currentChapter + 1);
+            }
+        }
+    }
+
+    function performSearch(query) {
+        lastSearchQuery = query;
+        const lowerQuery = query.toLowerCase().trim();
+        const normalizedQuery = removeDiacritics(lowerQuery);
+
+        if (lowerQuery.length < 2) {
+            searchResults.innerHTML = '<div class="search-no-results">Introdu cel puțin 2 caractere...</div>';
+            return;
+        }
+
+        let results = [];
+        for (const [bookKey, book] of Object.entries(bibleData)) {
+            book.chapters.forEach((chapter, chapterIdx) => {
+                const verseLines = chapter.split('\n').filter(line => line.trim() !== '');
+                verseLines.forEach((verse, verseIdx) => {
+                    // Elimină notele [[...]] pentru căutare
+                    const cleanVerse = verse.replace(/\[\[[^\]]+\]\]/g, '').replace(/^\d+\.\s*/, '');
+                    const normalizedVerse = removeDiacritics(cleanVerse.toLowerCase());
+                    if (normalizedVerse.includes(normalizedQuery)) {
+                        const lowerClean = cleanVerse.toLowerCase();
+                        const index = lowerClean.indexOf(lowerQuery);
+                        let highlighted = cleanVerse;
+                        if (index !== -1) {
+                            const before = cleanVerse.substring(0, index);
+                            const match = cleanVerse.substring(index, index + lowerQuery.length);
+                            const after = cleanVerse.substring(index + lowerQuery.length);
+                            highlighted = before + `<span class="highlight">${match}</span>` + after;
+                        } else {
+                            const normLower = removeDiacritics(cleanVerse.toLowerCase());
+                            const normIdx = normLower.indexOf(normalizedQuery);
+                            if (normIdx !== -1) {
+                                const before = cleanVerse.substring(0, normIdx);
+                                const match = cleanVerse.substring(normIdx, normIdx + lowerQuery.length);
+                                const after = cleanVerse.substring(normIdx + lowerQuery.length);
+                                highlighted = before + `<span class="highlight">${match}</span>` + after;
+                            }
+                        }
+                        results.push({
+                            book: bookKey,
+                            bookTitle: book.title,
+                            chapter: chapterIdx + 1,
+                            verse: verseIdx + 1,
+                            text: highlighted,
+                            fullText: verse
+                        });
+                    }
+                });
+            });
+        }
+
+        if (results.length === 0) {
+            searchResults.innerHTML = `<div class="search-no-results">🔍 Niciun rezultat pentru "<strong>${query}</strong>"</div>`;
+            return;
+        }
+
+        let html = `<div style="color:#b8860b;font-size:0.8rem;padding:4px 16px 12px 16px;border-bottom:1px solid #333;">${results.length} rezultate găsite pentru "<strong>${query}</strong>"</div>`;
+        results.forEach(r => {
+            html += `
+                <div class="search-result" data-book="${r.book}" data-chapter="${r.chapter - 1}" data-verse="${r.verse - 1}">
+                    <div class="result-book">${r.bookTitle} – Capitolul ${r.chapter}, Versetul ${r.verse}</div>
+                    <div class="result-text">${r.text}</div>
+                </div>
+            `;
+        });
+        searchResults.innerHTML = html;
+
+        document.querySelectorAll('.search-result').forEach(el => {
+            el.addEventListener('click', function() {
+                const book = this.dataset.book;
+                const chapter = parseInt(this.dataset.chapter);
+                const verse = parseInt(this.dataset.verse);
+                searchOverlay.classList.remove('show');
+                loadChapter(book, chapter);
+                setTimeout(() => {
+                    const targetP = document.querySelector(`#p-${book}-${chapter}-${verse}`);
+                    if (targetP) {
+                        const topBarHeight = document.querySelector('.top-bar').offsetHeight || 60;
+                        const targetPos = targetP.getBoundingClientRect().top + window.scrollY - topBarHeight - 10;
+                        window.scrollTo({ top: targetPos, behavior: 'smooth' });
+                        targetP.style.transition = 'background 0.3s';
+                        targetP.style.background = 'rgba(184, 134, 11, 0.3)';
+                        setTimeout(() => {
+                            targetP.style.background = 'transparent';
+                        }, 2000);
+                    }
+                }, 200);
+            });
+        });
+    }
+
+    function applyFontSize() {
+        textContent.style.fontSize = currentFontSize + '%';
+        fontSizeDisplay.textContent = currentFontSize + '%';
+        try {
+            localStorage.setItem('bibleFontSize', currentFontSize);
+        } catch(e) {}
+    }
+
+    // EVENT LISTENERS
+    document.querySelectorAll('.menu-item').forEach(item => {
+        item.addEventListener('click', function() {
+            const book = this.dataset.book;
+            let startChapter = 0;
+            if (scrollMarker.book === book) {
+                startChapter = scrollMarker.chapter;
+            }
+            loadChapter(book, startChapter);
+        });
+    });
+
+    backBtn.addEventListener('click', showMenu);
+    prevChapterBtn.addEventListener('click', goToPrevChapter);
+    nextChapterBtn.addEventListener('click', goToNextChapter);
+    bottomPrevBtn.addEventListener('click', goToPrevChapter);
+    bottomNextBtn.addEventListener('click', goToNextChapter);
+
+    chapterSelect.addEventListener('change', function() {
+        const idx = parseInt(this.value, 10);
+        if (currentBook && !isNaN(idx)) {
+            loadChapter(currentBook, idx);
+        }
+    });
+
+    scrollMarkerBtn.addEventListener('click', function() {
+        if (scrollMarker.book && scrollMarker.elementId) {
+            goToScrollMarker();
+        } else {
+            saveScrollMarker();
+        }
+    });
+
+    scrollMarkerBtn.addEventListener('dblclick', function(e) {
+        e.preventDefault();
+        if (scrollMarker.book) {
+            clearScrollMarker();
+            this.style.transform = 'scale(0.8)';
+            setTimeout(() => {
+                this.style.transform = 'scale(1)';
+            }, 300);
+        } else {
+            showNote('📌 Nu există niciun marker de șters.');
+            setTimeout(hideNote, 1500);
+        }
+    });
+
+    themeToggle.addEventListener('click', function() {
+        isDarkTheme = !isDarkTheme;
+        document.body.classList.toggle('light-theme', !isDarkTheme);
+        this.textContent = isDarkTheme ? '🌙' : '☀️';
+    });
+
+    fontIncrease.addEventListener('click', function() {
+        if (currentFontSize < 200) {
+            currentFontSize += 10;
+            applyFontSize();
+        }
+    });
+
+    fontDecrease.addEventListener('click', function() {
+        if (currentFontSize > 60) {
+            currentFontSize -= 10;
+            applyFontSize();
+        }
+    });
+
+    closeNoteBtn.addEventListener('click', hideNote);
+    notePopup.addEventListener('click', function(e) {
+        if (e.target === this) hideNote();
+    });
+
+    searchBtn.addEventListener('click', function() {
+        searchOverlay.classList.add('show');
+        if (lastSearchQuery) {
+            searchInput.value = lastSearchQuery;
+            performSearch(lastSearchQuery);
+        } else {
+            searchInput.value = '';
+            searchResults.innerHTML = '<div class="search-no-results">🔍 Scrie un cuvânt sau o frază...</div>';
+        }
+        setTimeout(() => searchInput.focus(), 100);
+    });
+
+    searchCloseBtn.addEventListener('click', function() {
+        searchOverlay.classList.remove('show');
+    });
+
+    searchInput.addEventListener('input', function() {
+        performSearch(this.value);
+    });
+
+    searchInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            searchOverlay.classList.remove('show');
+        }
+    });
+
+    searchOverlay.addEventListener('click', function(e) {
+        if (e.target === this) {
+            searchOverlay.classList.remove('show');
+        }
+    });
+
+    // SWIPE
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let isSwiping = false;
+    const swipeContainer = document.getElementById('text-content');
+
+    swipeContainer.addEventListener('touchstart', function(e) {
+        touchStartX = e.changedTouches[0].screenX;
+        touchStartY = e.changedTouches[0].screenY;
+        isSwiping = false;
+    }, { passive: true });
+
+    swipeContainer.addEventListener('touchmove', function(e) {
+        const touch = e.changedTouches[0];
+        const deltaX = touch.screenX - touchStartX;
+        const deltaY = touch.screenY - touchStartY;
+        if (Math.abs(deltaY) > Math.abs(deltaX) * 0.8) {
+            isSwiping = false;
+            return;
+        }
+        if (Math.abs(deltaX) > 30) {
+            isSwiping = true;
+            e.preventDefault();
+        }
+    }, { passive: false });
+
+    swipeContainer.addEventListener('touchend', function(e) {
+        if (!isSwiping) return;
+        const touch = e.changedTouches[0];
+        const deltaX = touch.screenX - touchStartX;
+        if (deltaX < -50) {
+            goToNextChapter();
+        } else if (deltaX > 50) {
+            goToPrevChapter();
+        }
+        isSwiping = false;
+    }, { passive: true });
+
+    // RESTAURARE STARE
+    function restoreState() {
+        try {
+            const savedFont = localStorage.getItem('bibleFontSize');
+            if (savedFont) {
+                currentFontSize = parseInt(savedFont, 10);
+                if (currentFontSize < 60) currentFontSize = 60;
+                if (currentFontSize > 200) currentFontSize = 200;
+                applyFontSize();
+            }
+
+            const savedMarker = localStorage.getItem('bibleScrollMarker');
+            if (savedMarker) {
+                const parsed = JSON.parse(savedMarker);
+                if (parsed && parsed.book && bibleData[parsed.book]) {
+                    scrollMarker = parsed;
+                }
+            }
+            updateMarkerUI();
+
+            const lastRead = localStorage.getItem('bibleLastRead');
+            if (lastRead) {
+                const data = JSON.parse(lastRead);
+                if (data && data.book && bibleData[data.book]) {
+                    loadChapter(data.book, data.chapter);
+                    setTimeout(() => {
+                        if (scrollMarker.book === data.book &&
+                            scrollMarker.chapter === data.chapter &&
+                            scrollMarker.elementId) {
+                            scrollToMarkerElement();
+                        }
+                    }, 200);
+                    return;
+                }
+            }
+            showMenu();
+        } catch(e) {
+            showMenu();
+        }
+    }
+
+    restoreState();
+    console.log('✅ Aplicația rulează!');
+    console.log('📖 Textul pentru Matei 1 a fost preluat din link.');
+    console.log('📝 Notele sunt marcate cu un cerc care conține litera "i".');
+</script>
+
+</body>
+</html>
